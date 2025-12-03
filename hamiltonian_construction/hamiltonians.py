@@ -1,5 +1,7 @@
 import itertools
 
+import numpy as np
+
 class BaseHamiltonian:
     """
     Base Hamiltonian class.
@@ -20,7 +22,8 @@ class SingleParticleHamiltonian(BaseHamiltonian):
     """
     Single particle Hamiltonian
     """
-    def __init__(self, nlen, ndim, energy=0., base_coupling=1., list_energies=None):
+    def __init__(self, nlen, ndim, energy=0., base_coupling=1., list_energies=None,
+                 coupling_type='nearest neighbor', minimum_coupling=0.):
         super().__init__()
         self.len = nlen
         self.dim = ndim
@@ -39,7 +42,13 @@ class SingleParticleHamiltonian(BaseHamiltonian):
         else:
             self.energies = [energy for _ in range(nlen(self.state_list))]
 
+        # Add coupling information
         self.base_coupling = base_coupling
+        if coupling_type == 'nearest neighbor' or coupling_type == 'dipole':
+            self.coupling_type = coupling_type
+        else:
+            raise ValueError(f"Coupling_type {coupling_type} not recognized. Accepted "
+                             f"values are 'nearest neighbor' and 'dipole'.")
 
     def construct_hamiltonian(self):
         raise NotImplementedError("Need to implement construct_hamiltonian method")
