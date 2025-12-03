@@ -58,3 +58,16 @@ class SingleParticleHamiltonian(BaseHamiltonian):
 
     def construct_hamiltonian(self):
         raise NotImplementedError("Need to implement construct_hamiltonian method")
+
+
+class ManyBodyHamiltonian(BaseHamiltonian):
+    """
+    Many-Body Hamiltonian
+    """
+    def __init__(self, nlen, ndim, nparticles, base_coupling=1., coupling_type='nearest neighbor',
+                 minimum_coupling=0.):
+        super().__init__(nlen, ndim, base_coupling, coupling_type, minimum_coupling)
+
+        # Generate many-body state list for indexing diagonal of Hamiltonian.
+        self.state_list = list(itertools.combinations(self.lattice_basis, nparticles))
+
