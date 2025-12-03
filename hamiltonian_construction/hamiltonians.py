@@ -64,10 +64,22 @@ class ManyBodyHamiltonian(BaseHamiltonian):
     """
     Many-Body Hamiltonian
     """
-    def __init__(self, nlen, ndim, nparticles, base_coupling=1., coupling_type='nearest neighbor',
+    def __init__(self, nlen, ndim, nparticles, energy=0., list_energies=None,
+                 base_coupling=1., coupling_type='nearest neighbor',
                  minimum_coupling=0.):
         super().__init__(nlen, ndim, base_coupling, coupling_type, minimum_coupling)
 
         # Generate many-body state list for indexing diagonal of Hamiltonian.
         self.state_list = list(itertools.combinations(self.lattice_basis, nparticles))
+
+        # Generate diagonal energies
+        if list_energies is not None:
+            if len(list_energies) != len(self.state_list):
+                raise ValueError(
+                    f"Length of list_energies ({len(list_energies)}) does not match "
+                    f"length of state_list ({len(self.state_list)})"
+                )
+            self.energies = list_energies
+        else:
+            self.energies = [energy for _ in range(len(self.state_list))]
 
