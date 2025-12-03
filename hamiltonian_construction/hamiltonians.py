@@ -10,12 +10,13 @@ class BaseHamiltonian:
         pass
 
     def diagonalize(self, *args):
-        raise NotImplementedError("Need to implement diagonalize method for "
-                                  "Hamiltonian.")
+        raise NotImplementedError("Need to implement diagonalize method")
 
     def visualize_couplings(self, *args):
-        raise NotImplementedError("Need to implement visualize_couplings method for "
-                                  "Hamiltonian.")
+        raise NotImplementedError("Need to implement visualize_couplings method")
+
+    def construct_hamiltonian(self):
+        raise NotImplementedError("Need to implement construct_hamiltonian method")
 
 
 class SingleParticleHamiltonian(BaseHamiltonian):
