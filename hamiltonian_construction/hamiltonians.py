@@ -8,11 +8,12 @@ class BaseHamiltonian:
     """
     def __init__(self, nlen, ndim, base_coupling=1., coupling_type='nearest neighbor',
                  minimum_coupling=0.):
-        self.len = nlen
-        self.dim = ndim
+        self.nlen = nlen
+        self.ndim = ndim
 
         # Generate lattice basis
-        self.lattice_basis = list(itertools.product([x for x in range(nlen)], repeat=ndim))
+        self.lattice_basis = list(itertools.product([x for x in range(self.nlen)],
+                                                    repeat=self.ndim))
 
         # Add coupling information
         self.base_coupling = base_coupling
@@ -46,14 +47,14 @@ class SingleParticleHamiltonian(BaseHamiltonian):
 
         # Generate diagonal energies
         if list_energies is not None:
-            if nlen(list_energies) != nlen(self.state_list):
+            if len(list_energies) != len(self.state_list):
                 raise ValueError(
-                    f"Length of list_energies ({nlen(list_energies)}) does not match "
-                    f"length of state_list ({nlen(self.state_list)})"
+                    f"Length of list_energies ({len(list_energies)}) does not match "
+                    f"length of state_list ({len(self.state_list)})"
                 )
             self.energies = list_energies
         else:
-            self.energies = [energy for _ in range(nlen(self.state_list))]
+            self.energies = [energy for _ in range(len(self.state_list))]
 
     def construct_hamiltonian(self):
         raise NotImplementedError("Need to implement construct_hamiltonian method")
