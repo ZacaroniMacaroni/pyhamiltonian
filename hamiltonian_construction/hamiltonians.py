@@ -24,6 +24,10 @@ class BaseHamiltonian:
                              f"values are 'nearest neighbor' and 'dipole'.")
         self.minimum_coupling = minimum_coupling
 
+        # Placeholders for state list and energies
+        self.state_list = None
+        self.energies = None
+
     def _assign_couplings(self, state_1, state_2):
         raise NotImplementedError("Need to implement _assign_couplings method")
 
