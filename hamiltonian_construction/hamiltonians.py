@@ -31,7 +31,33 @@ class BaseHamiltonian:
         raise NotImplementedError("Need to implement visualize_couplings method")
 
     def construct_hamiltonian(self):
-        raise NotImplementedError("Need to implement construct_hamiltonian method")
+        """
+        Constructs the Hamiltonian matrix for the single particle case.
+
+        The matrix H has dimensions M x M, where M is the total number of sites.
+        Diagonal elements H_ii are the site energies (self.energies).
+        Off-diagonal elements H_ij are the coupling strengths (self._assign_couplings).
+        """
+        M = len(self.state_list)
+        H = np.zeros((M, M))
+
+        # 1. Set the diagonal elements (On-site energies)
+        np.fill_diagonal(H, self.energies)
+
+        # 2. Set the off-diagonal elements (Couplings)
+        for i in range(M):
+            for j in range(i + 1, M):
+                state_i = self.state_list[i]
+                state_j = self.state_list[j]
+
+                # Calculate coupling strength
+                coupling = self._assign_couplings(state_i, state_j)
+                
+                # Assign to both H[i, j] and H[j, i] since H must be Hermitian (Symmetric here)
+                H[i, j] = coupling
+                H[j, i] = coupling
+        
+        return H
 
 
 class SingleParticleHamiltonian(BaseHamiltonian):
@@ -71,35 +97,6 @@ class SingleParticleHamiltonian(BaseHamiltonian):
         else:
             raise ValueError(f"Coupling_type {self.coupling_type} not recognized. "
                              f"Accepted values are 'nearest neighbor' and 'dipole'.")
-
-    def construct_hamiltonian(self):
-        """
-        Constructs the Hamiltonian matrix for the single particle case.
-
-        The matrix H has dimensions M x M, where M is the total number of sites.
-        Diagonal elements H_ii are the site energies (self.energies).
-        Off-diagonal elements H_ij are the coupling strengths (self._assign_couplings).
-        """
-        M = len(self.state_list)
-        H = np.zeros((M, M))
-
-        # 1. Set the diagonal elements (On-site energies)
-        np.fill_diagonal(H, self.energies)
-
-        # 2. Set the off-diagonal elements (Couplings)
-        for i in range(M):
-            for j in range(i + 1, M):
-                state_i = self.state_list[i]
-                state_j = self.state_list[j]
-
-                # Calculate coupling strength
-                coupling = self._assign_couplings(state_i, state_j)
-                
-                # Assign to both H[i, j] and H[j, i] since H must be Hermitian (Symmetric here)
-                H[i, j] = coupling
-                H[j, i] = coupling
-        
-        return H
 
 
 class ManyBodyHamiltonian(BaseHamiltonian):
