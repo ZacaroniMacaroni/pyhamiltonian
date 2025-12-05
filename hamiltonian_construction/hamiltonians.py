@@ -24,11 +24,8 @@ class BaseHamiltonian:
                              f"values are 'nearest neighbor' and 'dipole'.")
         self.minimum_coupling = minimum_coupling
 
-    def diagonalize(self, *args):
-        raise NotImplementedError("Need to implement diagonalize method")
-
-    def visualize_couplings(self, *args):
-        raise NotImplementedError("Need to implement visualize_couplings method")
+    def _assign_couplings(self, state_1, state_2):
+        raise NotImplementedError("Need to implement _assign_couplings method")
 
     def construct_hamiltonian(self):
         """
