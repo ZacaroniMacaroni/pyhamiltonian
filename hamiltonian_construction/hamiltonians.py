@@ -20,6 +20,18 @@ class Lattice:
         
         # Helper map for O(1) energy lookups by coordinate
         self._coord_to_energy = {coord: en for coord, en in zip(self.sites, self.site_energies)}
+    
+    def _generate_basis(self):
+        raise NotImplementedError("Need to implement _generate_basis method")
+
+    def _generate_square_lattice(self):
+        raise NotImplementedError("Need to implement _generate_square_lattice method")
+    
+    def _generate_site_energies(self):
+        raise NotImplementedError("Need to implement _generate_site_energies method")
+
+    def get_energy_of_site(self, coordinate):
+        raise NotImplementedError("Need to implement get_energy_of_site method")
 
 class BaseHamiltonian:
     """
