@@ -149,7 +149,12 @@ class SingleParticleHamiltonian(BaseHamiltonian):
                 return self.base_coupling / dist**3
             else:
                 return 0.
-
+            
+    def _generate_state_energies(self):
+        """
+        Generates state energies for single-particle states.
+        """
+        return np.array([self.lattice.get_energy_of_site(site) for site in self.state_list])
 
 class ManyBodyHamiltonian(BaseHamiltonian):
     """
