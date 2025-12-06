@@ -5,12 +5,13 @@ class Lattice:
     """
     Class to handle Lattice generation and static disorder.
     """
-    def __init__(self, nlen, ndim, lattice_type='square', base_energy=0., disorder_strength=0.):
+    def __init__(self, nlen, ndim, lattice_type='square', base_energy=0., disorder_strength=0., disorder_type='uniform'):
         self.nlen = nlen
         self.ndim = ndim
         self.lattice_type = lattice_type.lower()
         self.base_energy = base_energy
         self.disorder_strength = disorder_strength
+        self.disorder_type = disorder_type.lower()
         
         # 1. Generate Geometry (Sites)
         self.sites = self._generate_basis()
@@ -36,7 +37,26 @@ class Lattice:
         return list(itertools.product([x for x in range(self.nlen)], repeat=self.ndim))
     
     def _generate_site_energies(self):
-        raise NotImplementedError("Need to implement _generate_site_energies method")
+        """
+        Generates on-site energies with static disorder. Allows user to specify uniform disorder or
+        Gaussian disorder.
+        """
+        num_sites = len(self.sites)
+        if self.disorder_strength == 0.:
+            return np.full(num_sites, self.base_energy)
+        
+        if self.disorder_type == 'uniform':
+            disorder = np.random.uniform(-self.disorder_strength / 2,
+                                         self.disorder_strength / 2,
+                                         size=num_sites)
+        elif self.disorder_type == 'gaussian':
+            disorder = np.random.normal(0., self.disorder_strength, size=num_sites)
+        else:
+            raise ValueError(f"Disorder type {self.disorder_type} not recognized. "
+                             f"Accepted values are 'uniform' and 'gaussian'.")
+        
+        return self.base_energy + disorder
+        
 
     def get_energy_of_site(self, coordinate):
         """Returns the energy of a specific site coordinate."""
