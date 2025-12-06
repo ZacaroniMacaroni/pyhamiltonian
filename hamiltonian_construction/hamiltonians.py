@@ -22,7 +22,14 @@ class Lattice:
         self._coord_to_energy = {coord: en for coord, en in zip(self.sites, self.site_energies)}
     
     def _generate_basis(self):
-        raise NotImplementedError("Need to implement _generate_basis method")
+        if self.lattice_type == 'square':
+            return self._generate_square_lattice()
+        elif self.lattice_type in ['triangular', 'hexagonal']:
+            # Placeholder for future implementation
+            raise NotImplementedError(f"Logic for {self.lattice_type} lattice is not yet implemented.")
+        else:
+            raise ValueError(f"Lattice type {self.lattice_type} not recognized. "
+                             f"Currently only 'square' lattice is implemented.")
 
     def _generate_square_lattice(self):
         raise NotImplementedError("Need to implement _generate_square_lattice method")
