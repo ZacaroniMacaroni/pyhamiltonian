@@ -133,14 +133,14 @@ class SingleParticleHamiltonian(BaseHamiltonian):
 
         # 2. Define Energies
         # In 1-body case, state energy is exactly the site energy (including disorder)
-        self.energies = self.lattice.site_energies
+        self.energies = self._generate_state_energies()
     
     def _assign_couplings(self, state_1, state_2):
         # Calculate Euclidean distance between coordinates
         dist = np.linalg.norm(np.array(state_1) - np.array(state_2))
         
         if self.coupling_type == 'nearest neighbor':
-            if dist <= 1.:
+            if dist < 1. + 1e-9:  # small tolerance for floating point
                 return self.base_coupling
             else:
                 return 0.
@@ -199,7 +199,7 @@ class ManyBodyHamiltonian(BaseHamiltonian):
             dist = np.linalg.norm(np.array(diff_12) - np.array(diff_21))
             
             if self.coupling_type == 'nearest neighbor':
-                if dist <= 1.:
+                if dist < 1. + 1e-9:  # small tolerance for floating point
                     return self.base_coupling
                 else:
                     return 0.
