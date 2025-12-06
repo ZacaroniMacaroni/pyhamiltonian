@@ -39,7 +39,8 @@ class Lattice:
         raise NotImplementedError("Need to implement _generate_site_energies method")
 
     def get_energy_of_site(self, coordinate):
-        raise NotImplementedError("Need to implement get_energy_of_site method")
+        """Returns the energy of a specific site coordinate."""
+        return self._coord_to_energy[coordinate]
 
 class BaseHamiltonian:
     """
