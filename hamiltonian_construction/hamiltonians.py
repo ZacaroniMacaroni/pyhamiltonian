@@ -32,7 +32,8 @@ class Lattice:
                              f"Currently only 'square' lattice is implemented.")
 
     def _generate_square_lattice(self):
-        raise NotImplementedError("Need to implement _generate_square_lattice method")
+        """Generates coordinates for a hyper-cubic (square) lattice."""
+        return list(itertools.product([x for x in range(self.nlen)], repeat=self.ndim))
     
     def _generate_site_energies(self):
         raise NotImplementedError("Need to implement _generate_site_energies method")
