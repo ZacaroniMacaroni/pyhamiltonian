@@ -26,7 +26,6 @@ class Lattice:
         if self.lattice_type == 'square':
             return self._generate_square_lattice()
         elif self.lattice_type in ['triangular', 'hexagonal']:
-            # Placeholder for future implementation
             raise NotImplementedError(f"Logic for {self.lattice_type} lattice is not yet implemented.")
         else:
             raise ValueError(f"Lattice type {self.lattice_type} not recognized. "
@@ -38,8 +37,7 @@ class Lattice:
     
     def _generate_site_energies(self):
         """
-        Generates on-site energies with static disorder. Allows user to specify uniform disorder or
-        Gaussian disorder.
+        Generates on-site energies with static disorder.
         """
         num_sites = len(self.sites)
         if self.disorder_strength == 0.:
@@ -62,27 +60,26 @@ class Lattice:
         """Returns the energy of a specific site coordinate."""
         return self._coord_to_energy[coordinate]
 
+
 class BaseHamiltonian:
     """
     Base Hamiltonian class.
     """
-    def __init__(self, lattice, base_coupling=1., coupling_type='nearest neighbor',
-                 minimum_coupling=0.):
+    def __init__(self, lattice, base_coupling=1., interaction_strength=0., 
+                 coupling_type='nearest neighbor', minimum_coupling=0.):
         
-        # Take a Lattice object 
         if not isinstance(lattice, Lattice):
             raise TypeError("The 'lattice' argument must be an instance of the Lattice class.")
         
         self.lattice = lattice
-        
-        # Add coupling information
         self.base_coupling = base_coupling
-        if coupling_type == 'nearest neighbor' or coupling_type == 'dipole':
+        self.interaction_strength = interaction_strength # Added for particle-particle interaction
+        self.minimum_coupling = minimum_coupling
+        
+        if coupling_type in ['nearest neighbor', 'dipole']:
             self.coupling_type = coupling_type
         else:
-            raise ValueError(f"Coupling_type {coupling_type} not recognized. Accepted "
-                             f"values are 'nearest neighbor' and 'dipole'.")
-        self.minimum_coupling = minimum_coupling
+            raise ValueError(f"Coupling_type {coupling_type} not recognized.")
 
         self.state_list = None
         self.energies = None
@@ -109,7 +106,6 @@ class BaseHamiltonian:
                 state_i = self.state_list[i]
                 state_j = self.state_list[j]
 
-                # Calculate coupling strength
                 coupling = self._assign_couplings(state_i, state_j)
                 
                 # Assign to both H[i, j] and H[j, i] (Hermitian)
@@ -125,22 +121,19 @@ class SingleParticleHamiltonian(BaseHamiltonian):
     """
     def __init__(self, lattice, base_coupling=1., coupling_type='nearest neighbor', 
                  minimum_coupling=0.):
-        super().__init__(lattice, base_coupling, coupling_type, minimum_coupling)
+        # Single particles don't have particle-particle interactions, so interaction_strength=0
+        super().__init__(lattice, base_coupling=base_coupling, interaction_strength=0., 
+                         coupling_type=coupling_type, minimum_coupling=minimum_coupling)
 
-        # 1. Define States
-        # In 1-body case, the states are simply the lattice sites themselves
         self.state_list = self.lattice.sites
-
-        # 2. Define Energies
-        # In 1-body case, state energy is exactly the site energy (including disorder)
-        self.energies = self._generate_state_energies()
+        self.energies = self.lattice.site_energies
     
     def _assign_couplings(self, state_1, state_2):
-        # Calculate Euclidean distance between coordinates
         dist = np.linalg.norm(np.array(state_1) - np.array(state_2))
         
+        # FIX: Added tolerance (1e-9) to handle floating point imprecision
         if self.coupling_type == 'nearest neighbor':
-            if dist < 1. + 1e-9:  # small tolerance for floating point
+            if dist <= 1.0 + 1e-9: 
                 return self.base_coupling
             else:
                 return 0.
@@ -149,45 +142,49 @@ class SingleParticleHamiltonian(BaseHamiltonian):
                 return self.base_coupling / dist**3
             else:
                 return 0.
-            
-    def _generate_state_energies(self):
-        """
-        Generates state energies for single-particle states.
-        """
-        return np.array([self.lattice.get_energy_of_site(site) for site in self.state_list])
+
 
 class ManyBodyHamiltonian(BaseHamiltonian):
     """
     Many-Body Hamiltonian.
+    Models Hard-Core Bosons (implied by itertools.combinations).
     """
-    def __init__(self, lattice, nparticles, base_coupling=1., 
+    def __init__(self, lattice, nparticles, base_coupling=1., interaction_strength=0.,
                  coupling_type='nearest neighbor', minimum_coupling=0.):
-        super().__init__(lattice, base_coupling, coupling_type, minimum_coupling)
+        super().__init__(lattice, base_coupling=base_coupling, interaction_strength=interaction_strength,
+                         coupling_type=coupling_type, minimum_coupling=minimum_coupling)
 
         self.nparticles = nparticles
-
-        # 1. Define States
-        # A state is a combination of N distinct lattice sites (Fermions/Hard-core Bosons logic implied by combinations)
+        
+        # Combinations imply Hard-Core Bosons (no two particles on the same site)
         self.state_list = list(itertools.combinations(self.lattice.sites, nparticles))
-
-        # 2. Define Energies
-        # The energy of a many-body state is the SUM of the energies of the occupied sites
         self.energies = self._calculate_many_body_energies()
 
     def _calculate_many_body_energies(self):
         """
-        Sums the individual site energies (from the Lattice) for every site
-        occupied in a specific Many-Body state.
+        Sums site energies and ADDS particle-particle interaction energies.
         """
         mb_energies = []
         for state in self.state_list:
-            # 'state' is a tuple of coordinates, e.g., ((0,0), (0,1))
-            total_energy = sum(self.lattice.get_energy_of_site(site) for site in state)
-            mb_energies.append(total_energy)
+            # 1. Sum of on-site potential energies (Disorder)
+            site_energy_sum = sum(self.lattice.get_energy_of_site(site) for site in state)
+            
+            # 2. Add Interaction Energy (e.g. Nearest Neighbor Repulsion)
+            interaction_energy = 0.
+            if self.interaction_strength != 0:
+                # Check every pair of particles in this state
+                for i in range(self.nparticles):
+                    for j in range(i + 1, self.nparticles):
+                        dist = np.linalg.norm(np.array(state[i]) - np.array(state[j]))
+                        # FIX: Added tolerance here as well
+                        if dist <= 1.0 + 1e-9:
+                            interaction_energy += self.interaction_strength
+            
+            mb_energies.append(site_energy_sum + interaction_energy)
+            
         return np.array(mb_energies)
     
     def _assign_couplings(self, state_1, state_2):
-        # Logic: Exactly one particle hops from one site to another
         common_sites = set(state_1).intersection(state_2)
         share_site = (len(common_sites) == (len(state_1) - 1))
         
@@ -195,11 +192,11 @@ class ManyBodyHamiltonian(BaseHamiltonian):
             diff_12 = sorted(set(state_1) - set(state_2))
             diff_21 = sorted(set(state_2) - set(state_1))
 
-            # Compute distance between the old site and the new site
             dist = np.linalg.norm(np.array(diff_12) - np.array(diff_21))
             
+            # FIX: Added tolerance (1e-9)
             if self.coupling_type == 'nearest neighbor':
-                if dist < 1. + 1e-9:  # small tolerance for floating point
+                if dist <= 1.0 + 1e-9:
                     return self.base_coupling
                 else:
                     return 0.
