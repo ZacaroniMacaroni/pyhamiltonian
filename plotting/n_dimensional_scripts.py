@@ -25,7 +25,8 @@ class NDimPlot:
         fig, ax = plt.subplots()
         ax.set_xlabel('Eigenstate Index')
         ax.set_ylabel('Eigenvalue')
-        ax.plot(eigvals)
+        ax.set_xticks(range(len(eigvals)))
+        ax.plot(eigvals, ls='', marker='o')
         return fig, ax
 
     def _project_eigvec(self, eigvec, selected_dim):
