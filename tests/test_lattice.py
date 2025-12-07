@@ -14,20 +14,21 @@ def test_square_lattice_sites_1d():
 
 
 def test_square_lattice_sites_2d():
-    lattice = Lattice(nlen=2, ndim=2, disorder_strength=0.)
-    # Cartesian product of {0,1} x {0,1}
-    expected_sites = [(0, 0), (0, 1), (1, 0), (1, 1)]
+    lattice = Lattice(nlen=3, ndim=2, disorder_strength=0.)
+    # Cartesian product of {0,1,2} x {0,1,2}
+    expected_sites = [(0, 0), (0, 1), (0, 2),
+                      (1, 0), (1, 1), (1, 2),
+                      (2, 0), (2, 1), (2, 2)]
     assert set(lattice.sites) == set(expected_sites)
-    assert len(lattice.sites) == 4
-
+    assert len(lattice.sites) == 9
 
 def test_no_disorder_has_constant_energy():
     base_energy = 1.5
     lattice = Lattice(nlen=3, ndim=1, base_energy=base_energy, disorder_strength=0.)
     assert np.all(lattice.site_energies == base_energy)
     # Energy lookup should agree
-    for coord in lattice.sites:
-        assert lattice.get_energy_of_site(coord) == base_energy
+    for site in lattice.sites:
+        assert lattice.get_energy_of_site(site) == base_energy
 
 
 def test_uniform_disorder_range_is_correct():
@@ -43,6 +44,7 @@ def test_uniform_disorder_range_is_correct():
     hi = base + strength / 2
     assert np.all(lattice.site_energies >= lo)
     assert np.all(lattice.site_energies <= hi)
+    assert not np.allclose(lattice.site_energies, lattice.site_energies[0])  # ensure not all same
 
 
 def test_gaussian_disorder_mean_is_reasonable():
