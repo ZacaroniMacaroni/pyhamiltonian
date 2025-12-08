@@ -1,3 +1,5 @@
+import itertools
+
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -29,21 +31,39 @@ class NDimPlot:
         ax.plot(eigvals, ls='', marker='o')
         return fig, ax
 
-    def _project_eigvec(self, eigvec, selected_dim):
+    def _project_eigpop(self, eigpop, selected_dim):
         """
         Projects eigenvector onto a subset of 1-2 dimensions for plotting.
 
         Parameters:
-            1. eigvec: np.ndarray
-                       Eigenvector to be projected.
+            1. eigpop: np.ndarray
+                       Population vector to be projected.
             2. selected_dim: Tuple[int]
                              Tuple of indices of the projected dimensions.
 
         Returns:
-            1. projected_eigvec: np.ndarray
+            1. projected_eigpop: np.ndarray
                                  [PLACEHOLDER TEXT]
         """
-        raise NotImplementedError("Need to implement _project_eigvec method.")
+        projected_eigpop = np.zeros((self.hamiltonian.lattice.nlen,) * len(selected_dim))
+        # For selected dimension(s), group states containing each possible coordinate
+        list_coords_selected = list(itertools.product(
+            range(self.hamiltonian.lattice.nlen),
+            repeat=len(selected_dim)
+        ))
+        list_coords_unselected = list(itertools.product(
+            range(self.hamiltonian.lattice.nlen),
+            repeat=self.hamiltonian.lattice.ndim-len(selected_dim)
+        ))
+        for coords_selected in list_coords_selected:
+            for coords_unselected in list_coords_unselected:
+                # Convert coords_unselected to list to use insert method
+                coords = list(coords_unselected)
+                for i in range(len(selected_dim)):
+                    coords.insert(selected_dim[i], coords_selected[0])
+                projected_eigpop[*coords_selected] \
+                    += eigpop[self.hamiltonian.state_list.index(tuple(coords))]
+        return projected_eigpop
 
     def plot_eigenstate_population(self, idx, selected_dim):
         """
@@ -72,9 +92,10 @@ class NDimPlot:
         idx_sorted = np.argsort(eigvals)
         eigvecs = eigvecs[:, idx_sorted]
         selected_eigvec = eigvecs[:, idx]
+        eigpop = np.abs(selected_eigvec)**2
 
         # Project eigenvector onto selected dimensions
-        projected_eigvec = self._project_eigvec(selected_eigvec, selected_dim)
+        projected_eigpop = self._project_eigpop(eigpop, selected_dim)
 
         # Plot population distribution
         pass
