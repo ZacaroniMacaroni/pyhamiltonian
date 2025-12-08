@@ -24,7 +24,7 @@ class NDimPlot:
         Returns a plot of the energy spectrum of the Hamiltonian, in order of increasing
         energy.
         """
-        eigvals = sorted(np.linalg.eigvals(self.hamiltonian.construct_hamiltonian()))
+        eigvals = sorted(np.linalg.eigvalsh(self.hamiltonian.construct_hamiltonian()))
         fig, ax = plt.subplots()
         ax.set_xlabel('Eigenstate Index')
         ax.set_ylabel('Eigenvalue')
@@ -46,15 +46,15 @@ class NDimPlot:
             1. projected_eigpop: np.ndarray
                                  [PLACEHOLDER TEXT]
         """
-        projected_eigpop = np.zeros((self.hamiltonian.lattice.nlen,) * len(selected_dim))
+        projected_eigpop = np.zeros((self.lattice.nlen,) * len(selected_dim))
         # For selected dimension(s), group states containing each possible coordinate
         list_coords_selected = list(itertools.product(
-            range(self.hamiltonian.lattice.nlen),
+            range(self.lattice.nlen),
             repeat=len(selected_dim)
         ))
         list_coords_unselected = list(itertools.product(
-            range(self.hamiltonian.lattice.nlen),
-            repeat=self.hamiltonian.lattice.ndim-len(selected_dim)
+            range(self.lattice.nlen),
+            repeat=self.lattice.ndim-len(selected_dim)
         ))
         for coords_selected in list_coords_selected:
             for coords_unselected in list_coords_unselected:
@@ -79,7 +79,7 @@ class NDimPlot:
                              Note: Tuple must have length <= 2 to provide an axis for
                              population.
         """
-        if (selected_dim is None and self.hamiltonian.lattice.ndim > 2) or \
+        if (selected_dim is None and self.lattice.ndim > 2) or \
                 (len(selected_dim) > 2):
             raise ValueError("Must project to <= 2 dimensions to plot population "
                              "distribution.")
@@ -103,12 +103,12 @@ class NDimPlot:
             fig, ax = plt.subplots()
             ax.set_xlabel('Position')
             ax.set_ylabel('Population')
-            ax.set_xticks(range(self.hamiltonian.lattice.nlen))
+            ax.set_xticks(range(self.lattice.nlen))
             ax.plot(projected_eigpop)
             fig.show()
         elif len(selected_dim) == 2:
             # Use a true 3D axis and render the population as a surface
-            n = self.hamiltonian.lattice.nlen
+            n = self.lattice.nlen
             fig = plt.figure()
             ax = fig.add_subplot(projection='3d')
             ax.set_xlabel('Position Coordinate {}'.format(selected_dim[0]))
@@ -123,3 +123,12 @@ class NDimPlot:
             surf = ax.plot_surface(X, Y, Z, cmap='viridis', vmin=0)
             fig.colorbar(surf, ax=ax, shrink=0.6, aspect=10, pad=0.1, label='Population')
             fig.show()
+
+class NParticlePlot:
+    """
+    Plotter for 1-D N-particle systems.
+    """
+    def __init__(self, hamiltonian):
+        if hamiltonian.lattice.ndim != 1:
+            raise ValueError("NParticlePlot only works for 1-D systems.")
+        self.hamiltonian = hamiltonian
