@@ -83,6 +83,7 @@ class NDimPlot(BasePlot):
                              Note: Tuple must have length <= 2 to provide an axis for
                              population.
         """
+        # Initial checks on selected_dim
         if (selected_dim is None and self.lattice.ndim > 2) or \
                 (len(selected_dim) > 2):
             raise ValueError("Must project to <= 2 dimensions to plot population "
@@ -90,6 +91,7 @@ class NDimPlot(BasePlot):
         elif (selected_dim is not None) and (len(selected_dim) == 0):
             raise ValueError("Must select at least one dimension to plot population "
                              "distribution.")
+
         eigvals, eigvecs = np.linalg.eigh(self.hamiltonian.construct_hamiltonian())
 
         # Need to reorder eigenvectors such that they are sorted based on
@@ -111,17 +113,16 @@ class NDimPlot(BasePlot):
             ax.plot(projected_eigpop)
             fig.show()
         elif len(selected_dim) == 2:
-            # Use a true 3D axis and render the population as a surface
-            n = self.lattice.nlen
+            # For 3-D plot, render the population as a surface
             fig = plt.figure()
             ax = fig.add_subplot(projection='3d')
             ax.set_xlabel('Position Coordinate {}'.format(selected_dim[0]))
             ax.set_ylabel('Position Coordinate {}'.format(selected_dim[1]))
-            ax.set_xticks(range(n))
-            ax.set_yticks(range(n))
+            ax.set_xticks(range(self.lattice.nlen))
+            ax.set_yticks(range(self.lattice.nlen))
             ax.set_zlabel('Population')
 
-            X, Y = np.meshgrid(range(n), range(n))
+            X, Y = np.meshgrid(range(self.lattice.nlen), range(self.lattice.nlen))
             Z = projected_eigpop
 
             surf = ax.plot_surface(X, Y, Z, cmap='viridis', vmin=0)
@@ -139,5 +140,42 @@ class NParticlePlot(BasePlot):
         else:
             super().__init__(hamiltonian)
 
+    def _project_eigpop(self, eigpop):
+        """
+        Projects N-particle eigenvector population onto site basis.
+        """
+        projected_eigpop = np.zeros(self.lattice.nlen)
+        for site in range(self.lattice.nlen):
+            for state in self.hamiltonian.state_list:
+                if site in state:
+                    projected_eigpop[site] += eigpop[self.hamiltonian.state_list.index(state)]
+        return projected_eigpop
+
     def plot_eigenstate_population(self, idx):
-        raise NotImplementedError("Not yet implemented.")
+        """
+        Returns a plot of the population distribution of a specific eigenstate, taking
+        the probability of finding any particle at a given site as the site population.
+
+        Parameters:
+            1. idx: int
+                    Index of the eigenstate to plot.
+        """
+        eigvals, eigvecs = np.linalg.eigh(self.hamiltonian.construct_hamiltonian())
+
+        # Need to reorder eigenvectors such that they are sorted based on
+        # increasing eigenvalue
+        idx_sorted = np.argsort(eigvals)
+        eigvecs = eigvecs[:, idx_sorted]
+        selected_eigvec = eigvecs[:, idx]
+        eigpop = np.abs(selected_eigvec)**2
+
+        # Project N-particle states onto site basis
+        projected_eigpop = self._project_eigpop(eigpop)
+
+        # Plot population distribution
+        fig, ax = plt.subplots()
+        ax.set_xlabel('Position')
+        ax.set_ylabel('Population')
+        ax.set_xticks(range(self.lattice.nlen))
+        ax.plot(projected_eigpop)
+        fig.show()
