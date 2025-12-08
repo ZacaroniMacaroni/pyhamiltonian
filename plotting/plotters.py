@@ -7,7 +7,15 @@ from mpl_toolkits.mplot3d import Axes3D
 from hamiltonian_construction.hamiltonians import SingleParticleHamiltonian
 
 class BasePlot:
+    """
+    Base plotter class.
+    """
     def __init__(self, hamiltonian):
+        """
+        Parameters:
+            1. hamiltonian: SingleParticleHamiltonian or ManyBodyHamiltonian
+                            Hamiltonian object to be used for plotting.
+        """
         self.nlen = hamiltonian.lattice.nlen
         self.ndim = hamiltonian.lattice.ndim
         self.hamiltonian = hamiltonian
@@ -30,6 +38,11 @@ class NDimPlot(BasePlot):
     Plotter for single-particle N-dimensional systems.
     """
     def __init__(self, hamiltonian):
+        """
+        Parameters:
+            1. hamiltonian: SingleParticleHamiltonian
+                            Single particle Hamiltonian object to be used for plotting
+        """
         if not isinstance(hamiltonian, SingleParticleHamiltonian):
             raise TypeError("Hamiltonian must be an instance of "
                             "SingleParticleHamiltonian.")
@@ -92,6 +105,8 @@ class NDimPlot(BasePlot):
         elif (selected_dim is not None) and (len(selected_dim) == 0):
             raise ValueError("Must select at least one dimension to plot population "
                              "distribution.")
+        elif selected_dim is None:
+            selected_dim = tuple(range(self.ndim))
 
         eigvals, eigvecs = np.linalg.eigh(self.hamiltonian.construct_hamiltonian())
 
@@ -133,6 +148,12 @@ class NParticlePlot(BasePlot):
     Plotter for 1-D N-particle systems.
     """
     def __init__(self, hamiltonian):
+        """
+        Parameters:
+            1. hamiltonian: SingleParticleHamiltonian or ManyBodyHamiltonian
+                            Hamiltonian object to be used for plotting (must be 1-D for
+                            current implementation of plotter).
+        """
         if hamiltonian.lattice.ndim != 1:
             raise ValueError("NParticlePlot only works for 1-D systems.")
         else:
@@ -154,7 +175,8 @@ class NParticlePlot(BasePlot):
         for site in range(self.nlen):
             for state in self.hamiltonian.state_list:
                 if (site,) in state:
-                    projected_eigpop[site] += eigpop[self.hamiltonian.state_list.index(state)]
+                    projected_eigpop[site] \
+                        += eigpop[self.hamiltonian.state_list.index(state)]
         return projected_eigpop
 
     def plot_eigenstate_population(self, idx):

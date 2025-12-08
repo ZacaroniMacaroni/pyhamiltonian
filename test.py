@@ -1,6 +1,6 @@
 from hamiltonian_construction.hamiltonians import SingleParticleHamiltonian, \
     ManyBodyHamiltonian, Lattice
-from plotting.n_dimensional_scripts import NDimPlot
+from plotting.plotters import NDimPlot
 
 lat = Lattice(2, 2)
 
