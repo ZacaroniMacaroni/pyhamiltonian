@@ -6,18 +6,10 @@ from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 (enables 3D projection)
 
 from hamiltonian_construction.hamiltonians import SingleParticleHamiltonian
 
-
-class NDimPlot:
-    """
-    Plotter for single-particle N-dimensional systems.
-    """
+class BasePlot:
     def __init__(self, hamiltonian):
         self.lattice = hamiltonian.lattice
-        if not isinstance(hamiltonian, SingleParticleHamiltonian):
-            raise TypeError("Hamiltonian must be an instance of "
-                            "SingleParticleHamiltonian.")
-        else:
-            self.hamiltonian = hamiltonian
+        self.hamiltonian = hamiltonian
 
     def plot_energy_spectrum(self):
         """
@@ -31,6 +23,18 @@ class NDimPlot:
         ax.set_xticks(range(len(eigvals)))
         ax.plot(eigvals, ls='', marker='o')
         fig.show()
+
+
+class NDimPlot(BasePlot):
+    """
+    Plotter for single-particle N-dimensional systems.
+    """
+    def __init__(self, hamiltonian):
+        if not isinstance(hamiltonian, SingleParticleHamiltonian):
+            raise TypeError("Hamiltonian must be an instance of "
+                            "SingleParticleHamiltonian.")
+        else:
+            super().__init__(hamiltonian)
 
     def _project_eigpop(self, eigpop, selected_dim):
         """
@@ -124,11 +128,16 @@ class NDimPlot:
             fig.colorbar(surf, ax=ax, shrink=0.6, aspect=10, pad=0.1, label='Population')
             fig.show()
 
-class NParticlePlot:
+
+class NParticlePlot(BasePlot):
     """
     Plotter for 1-D N-particle systems.
     """
     def __init__(self, hamiltonian):
         if hamiltonian.lattice.ndim != 1:
             raise ValueError("NParticlePlot only works for 1-D systems.")
-        self.hamiltonian = hamiltonian
+        else:
+            super().__init__(hamiltonian)
+
+    def plot_eigenstate_population(self, idx):
+        raise NotImplementedError("Not yet implemented.")
