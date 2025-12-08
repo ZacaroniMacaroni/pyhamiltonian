@@ -2,6 +2,7 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
+from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 (enables 3D projection)
 
 from hamiltonian_construction.hamiltonians import SingleParticleHamiltonian
 
@@ -29,7 +30,7 @@ class NDimPlot:
         ax.set_ylabel('Eigenvalue')
         ax.set_xticks(range(len(eigvals)))
         ax.plot(eigvals, ls='', marker='o')
-        return fig, ax
+        fig.show()
 
     def _project_eigpop(self, eigpop, selected_dim):
         """
@@ -60,12 +61,12 @@ class NDimPlot:
                 # Convert coords_unselected to list to use insert method
                 coords = list(coords_unselected)
                 for i in range(len(selected_dim)):
-                    coords.insert(selected_dim[i], coords_selected[0])
+                    coords.insert(selected_dim[i], coords_selected[i])
                 projected_eigpop[*coords_selected] \
                     += eigpop[self.hamiltonian.state_list.index(tuple(coords))]
         return projected_eigpop
 
-    def plot_eigenstate_population(self, idx, selected_dim):
+    def plot_eigenstate_population(self, idx, selected_dim=None):
         """
         Returns a plot of the population distribution of a specific eigenstate in the
         projected dimensions.
@@ -78,7 +79,7 @@ class NDimPlot:
                              Note: Tuple must have length <= 2 to provide an axis for
                              population.
         """
-        if (selected_dim is None and self.hamiltonian.lattice.dimension > 2) or \
+        if (selected_dim is None and self.hamiltonian.lattice.ndim > 2) or \
                 (len(selected_dim) > 2):
             raise ValueError("Must project to <= 2 dimensions to plot population "
                              "distribution.")
@@ -98,4 +99,27 @@ class NDimPlot:
         projected_eigpop = self._project_eigpop(eigpop, selected_dim)
 
         # Plot population distribution
-        pass
+        if len(selected_dim) == 1:
+            fig, ax = plt.subplots()
+            ax.set_xlabel('Position')
+            ax.set_ylabel('Population')
+            ax.set_xticks(range(self.hamiltonian.lattice.nlen))
+            ax.plot(projected_eigpop)
+            fig.show()
+        elif len(selected_dim) == 2:
+            # Use a true 3D axis and render the population as a surface
+            n = self.hamiltonian.lattice.nlen
+            fig = plt.figure()
+            ax = fig.add_subplot(projection='3d')
+            ax.set_xlabel('Position Coordinate {}'.format(selected_dim[0]))
+            ax.set_ylabel('Position Coordinate {}'.format(selected_dim[1]))
+            ax.set_xticks(range(n))
+            ax.set_yticks(range(n))
+            ax.set_zlabel('Population')
+
+            X, Y = np.meshgrid(range(n), range(n))
+            Z = projected_eigpop
+
+            surf = ax.plot_surface(X, Y, Z, cmap='viridis', vmin=0)
+            fig.colorbar(surf, ax=ax, shrink=0.6, aspect=10, pad=0.1, label='Population')
+            fig.show()
