@@ -147,7 +147,7 @@ class NParticlePlot(BasePlot):
         projected_eigpop = np.zeros(self.lattice.nlen)
         for site in range(self.lattice.nlen):
             for state in self.hamiltonian.state_list:
-                if site in state:
+                if (site,) in state:
                     projected_eigpop[site] += eigpop[self.hamiltonian.state_list.index(state)]
         return projected_eigpop
 
