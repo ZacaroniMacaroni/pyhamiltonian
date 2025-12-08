@@ -1,0 +1,22 @@
+[project]
+name = "pyhamiltonian"
+version = "1.0.0"
+dependencies = [
+  "matplotlib",
+  "numpy",
+  "pytest",
+]
+requires-python = ">=3.12"
+authors = [
+  {name = "Zachary W. Freeman", email = "zachwfreeman@utexas.edu"},
+  {name = "Sivan Syed", email = ""}
+]
+maintainers = [
+  {name = "Zachary W. Freeman", email = "zachwfreeman@utexas.edu"}
+  {name = "Sivan Syed", email = ""}
+]
+description = "N-Particle arbitrary-dimensional Hamiltonian constructor"
+readme = "README.md"
+
+[project.urls]
+Repository = "https://github.com/ZacaroniMacaroni/pyhamiltonian"

@@ -1,25 +1,21 @@
 # pyhamiltonian
-N-particle Hamiltonian constructor in d-dimensional lattice space.
+N-particle Hamiltonian constructor in arbitrary-dimensional lattice space.
 
 # Purpose
-Generating Hamiltonians for N-particles while correctly accounting for couplings, many-body interactions, and dimensionality is difficult to generalize _a priori_. This constructor is intended to facilitate Hamiltonian construction for arbitrary lattice dimension, number of particles, and particle interactions via a straightforward UI. (We will restrict ourselves to the bosonic case for this implementation.)
+Generating Hamiltonians for N-particles while correctly accounting for couplings, many-body interactions, and dimensionality is difficult to generalize _a priori_. This constructor facilitates construction of Hamiltonians with arbitrary lattice dimension and number of particles. Furthermore, this class contains plotting features to observe eigenstate population features for arbitrary dimensions or numbers of particles.
+Note: at present, this constructor assumes indistinguishable bosons with "hard core" exclusion.
 
-# Directory Structure
-- hamiltonian-construction
-    - lattice-generation
-    - many-body-transformation
-- ui
-- analysis
+# Installation Instructions
+To install, run the following commands in a Python environment of your choice.
+```aiignore
+git clone https://github.com/ZacaroniMacaroni/pyhamiltonian.git
+cd pyhamiltonian
+pip install -e .
+```
 
-# Development Plan
-1. Generate N-dimensional Hamiltonian for 1-particle case
-2. Develop visualization of coupling using networkx
-3. Extend to 2-particle case and include many-body interactions
-4. Generalize to N-particle case
-5. Refine UI and input structure
-6. Add eigenstate decomposition visualization
-
-# Contributions (by member)
-Sivan S. will develop single-particle lattice indexing and Hamiltonian generation (via subclass of generic Hamiltonian) as well as a visualization class to show coupling relations.
-Zach F. will develop a generic Hamiltonian class and prepare methods for transforming from 1-particle basis to N-particle basis Hamiltonian (via generation of new N-particle Hamiltonian subclass).
-Both members will contribute to UI design and eigenstate decomposition classes.
+# Future Features
+- [ ] Add support for arbitrary many-body interactions.
+- [ ] Add support for fermionic creation/annihilation operators.
+- [ ] Add support for arbitrary lattice symmetries.
+- [ ] Develop a GUI for interactive visualization of Hamiltonian and eigenstate decomposition.
+- [ ] Add multidimensional N-particle plotting features.
