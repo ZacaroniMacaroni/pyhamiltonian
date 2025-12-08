@@ -2,13 +2,14 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D  # noqa: F401 (enables 3D projection)
+from mpl_toolkits.mplot3d import Axes3D
 
 from hamiltonian_construction.hamiltonians import SingleParticleHamiltonian
 
 class BasePlot:
     def __init__(self, hamiltonian):
-        self.lattice = hamiltonian.lattice
+        self.nlen = hamiltonian.lattice.nlen
+        self.ndim = hamiltonian.lattice.ndim
         self.hamiltonian = hamiltonian
 
     def plot_energy_spectrum(self):
@@ -20,7 +21,6 @@ class BasePlot:
         fig, ax = plt.subplots()
         ax.set_xlabel('Eigenstate Index')
         ax.set_ylabel('Eigenvalue')
-        ax.set_xticks(range(len(eigvals)))
         ax.plot(eigvals, ls='', marker='o')
         fig.show()
 
@@ -48,17 +48,18 @@ class NDimPlot(BasePlot):
 
         Returns:
             1. projected_eigpop: np.ndarray
-                                 [PLACEHOLDER TEXT]
+                                 Eigenstate population projected onto selected
+                                 dimensions.
         """
-        projected_eigpop = np.zeros((self.lattice.nlen,) * len(selected_dim))
+        projected_eigpop = np.zeros((self.nlen,) * len(selected_dim))
         # For selected dimension(s), group states containing each possible coordinate
         list_coords_selected = list(itertools.product(
-            range(self.lattice.nlen),
+            range(self.nlen),
             repeat=len(selected_dim)
         ))
         list_coords_unselected = list(itertools.product(
-            range(self.lattice.nlen),
-            repeat=self.lattice.ndim-len(selected_dim)
+            range(self.nlen),
+            repeat=self.ndim-len(selected_dim)
         ))
         for coords_selected in list_coords_selected:
             for coords_unselected in list_coords_unselected:
@@ -84,7 +85,7 @@ class NDimPlot(BasePlot):
                              population.
         """
         # Initial checks on selected_dim
-        if (selected_dim is None and self.lattice.ndim > 2) or \
+        if (selected_dim is None and self.ndim > 2) or \
                 (len(selected_dim) > 2):
             raise ValueError("Must project to <= 2 dimensions to plot population "
                              "distribution.")
@@ -109,7 +110,6 @@ class NDimPlot(BasePlot):
             fig, ax = plt.subplots()
             ax.set_xlabel('Position')
             ax.set_ylabel('Population')
-            ax.set_xticks(range(self.lattice.nlen))
             ax.plot(projected_eigpop)
             fig.show()
         elif len(selected_dim) == 2:
@@ -118,11 +118,9 @@ class NDimPlot(BasePlot):
             ax = fig.add_subplot(projection='3d')
             ax.set_xlabel('Position Coordinate {}'.format(selected_dim[0]))
             ax.set_ylabel('Position Coordinate {}'.format(selected_dim[1]))
-            ax.set_xticks(range(self.lattice.nlen))
-            ax.set_yticks(range(self.lattice.nlen))
             ax.set_zlabel('Population')
 
-            X, Y = np.meshgrid(range(self.lattice.nlen), range(self.lattice.nlen))
+            X, Y = np.meshgrid(range(self.nlen), range(self.nlen))
             Z = projected_eigpop
 
             surf = ax.plot_surface(X, Y, Z, cmap='viridis', vmin=0)
@@ -143,9 +141,17 @@ class NParticlePlot(BasePlot):
     def _project_eigpop(self, eigpop):
         """
         Projects N-particle eigenvector population onto site basis.
+
+        Parameters:
+            1. eigpop: np.ndarray
+                       Population vector to be projected.
+
+        Returns:
+            1. projected_eigpop: np.ndarray
+                                 Eigenstate population projected onto site basis.
         """
-        projected_eigpop = np.zeros(self.lattice.nlen)
-        for site in range(self.lattice.nlen):
+        projected_eigpop = np.zeros(self.nlen)
+        for site in range(self.nlen):
             for state in self.hamiltonian.state_list:
                 if (site,) in state:
                     projected_eigpop[site] += eigpop[self.hamiltonian.state_list.index(state)]
@@ -176,6 +182,5 @@ class NParticlePlot(BasePlot):
         fig, ax = plt.subplots()
         ax.set_xlabel('Position')
         ax.set_ylabel('Population')
-        ax.set_xticks(range(self.lattice.nlen))
         ax.plot(projected_eigpop)
         fig.show()
