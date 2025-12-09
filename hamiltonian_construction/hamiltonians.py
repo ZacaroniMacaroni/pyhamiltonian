@@ -5,13 +5,15 @@ class Lattice:
     """
     Class to handle Lattice generation and static disorder.
     """
-    def __init__(self, nlen, ndim, lattice_type='square', base_energy=0., disorder_strength=0., disorder_type='uniform'):
+    def __init__(self, nlen, ndim, lattice_type='square', base_energy=0., disorder_strength=0., disorder_type='uniform', random_seed=None):
         self.nlen = nlen
         self.ndim = ndim
         self.lattice_type = lattice_type.lower()
         self.base_energy = base_energy
         self.disorder_strength = disorder_strength
         self.disorder_type = disorder_type.lower()
+        if random_seed is not None:
+            np.random.seed(random_seed)
         
         # 1. Generate Geometry (Sites)
         self.sites = self._generate_basis()
