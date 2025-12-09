@@ -2,7 +2,7 @@
 import numpy as np
 import pytest
 
-from hamiltonian_construction.hamiltonians import Lattice
+from src.hamiltonian_construction.hamiltonians import Lattice
 
 
 def test_square_lattice_sites_1d():

@@ -1,6 +1,6 @@
-from hamiltonian_construction.hamiltonians import SingleParticleHamiltonian, \
+from src.hamiltonian_construction.hamiltonians import SingleParticleHamiltonian, \
     ManyBodyHamiltonian, Lattice
-from plotting.plotters import NDimPlot, NParticlePlot
+from src.plotting.plotters import NDimPlot, NParticlePlot
 
 # Sample 2-D Hamiltonian
 lat = Lattice(50, 2, disorder_type='uniform', disorder_strength=0.5)

@@ -2,9 +2,8 @@ import itertools
 
 import matplotlib.pyplot as plt
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
 
-from hamiltonian_construction.hamiltonians import SingleParticleHamiltonian
+from src.hamiltonian_construction.hamiltonians import SingleParticleHamiltonian
 
 class BasePlot:
     """

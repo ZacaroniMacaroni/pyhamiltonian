@@ -1,7 +1,7 @@
 # tests/test_single_particle.py
 import numpy as np
 
-from hamiltonian_construction.hamiltonians import Lattice, SingleParticleHamiltonian
+from src.hamiltonian_construction.hamiltonians import Lattice, SingleParticleHamiltonian
 
 
 def test_single_particle_hamiltonian_shape_and_diag():
