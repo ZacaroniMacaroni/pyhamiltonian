@@ -13,6 +13,31 @@ cd pyhamiltonian
 pip install -e .
 ```
 
+# Usage
+For simple Hamiltonian initialization and construction, see the example code below.
+```aiignore
+from pyhamiltonian import ManyBodyHamiltonian, Lattice
+
+# Lattice Initialization
+nlen = 2  # Number of sites along each lattice dimension
+ndim = 2  # Number of lattice dimensions
+base_energy = 0.  # Base site energies
+disorder_type = 'uniform'  # Energy disorder distribution type
+disorder_strength = 0.5  # Strength of energy disorder
+
+lattice = lattice(nlen, ndim, base_energy, disorder_strength, disorder_type)
+
+# Hamiltonian initialization
+nparticles = 2  # Number of particles
+base_coupling = 1.  # Base couplings between sites
+coupling_type = 'nearest neighbor'
+
+hamiltonian = ManyBodyHamiltonian(lattice, nparticles, base_coupling, coupling_type)
+
+# Array construction
+hamiltonian.construct_hamiltonian()
+```
+
 # Future Features
 - [ ] Add support for arbitrary many-body interactions.
 - [ ] Add support for fermionic creation/annihilation operators.
