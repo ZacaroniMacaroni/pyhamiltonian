@@ -12,7 +12,7 @@ authors = [
   {name = "Sivan Z. Syed", email = "sivan.syed@utexas.edu"}
 ]
 maintainers = [
-  {name = "Zachary W. Freeman", email = "zachwfreeman@utexas.edu"}
+  {name = "Zachary W. Freeman", email = "zachwfreeman@utexas.edu"},
   {name = "Sivan Z. Syed", email = "sivan.syed@utexas.edu"}
 ]
 description = "N-Particle arbitrary-dimensional Hamiltonian constructor"
