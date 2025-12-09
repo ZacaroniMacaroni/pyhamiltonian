@@ -9,11 +9,11 @@ dependencies = [
 requires-python = ">=3.12"
 authors = [
   {name = "Zachary W. Freeman", email = "zachwfreeman@utexas.edu"},
-  {name = "Sivan Syed", email = ""}
+  {name = "Sivan Z. Syed", email = "sivan.syed@utexas.edu"}
 ]
 maintainers = [
   {name = "Zachary W. Freeman", email = "zachwfreeman@utexas.edu"}
-  {name = "Sivan Syed", email = ""}
+  {name = "Sivan Z. Syed", email = "sivan.syed@utexas.edu"}
 ]
 description = "N-Particle arbitrary-dimensional Hamiltonian constructor"
 readme = "README.md"
