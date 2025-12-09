@@ -152,12 +152,14 @@ class NParticlePlot(BasePlot):
     def __init__(self, hamiltonian):
         """
         Parameters:
-            1. hamiltonian: SingleParticleHamiltonian or ManyBodyHamiltonian
+            1. hamiltonian: ManyBodyHamiltonian
                             Hamiltonian object to be used for plotting (must be 1-D for
                             current implementation of plotter).
         """
-        if hamiltonian.lattice.ndim != 1:
-            raise ValueError("NParticlePlot only works for 1-D systems.")
+        if (isinstance(hamiltonian, SingleParticleHamiltonian) or
+                (hamiltonian.lattice.ndim != 1)):
+            raise ValueError("Hamiltonian must be an instance of "
+                             "ManyBodyHamiltonian with 1-D lattice.")
         else:
             super().__init__(hamiltonian)
 
