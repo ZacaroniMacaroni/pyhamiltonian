@@ -5,7 +5,29 @@ class Lattice:
     """
     Class to handle Lattice generation and static disorder.
     """
-    def __init__(self, nlen, ndim, lattice_type='square', base_energy=0., disorder_strength=0., disorder_type='uniform', random_seed=None):
+    def __init__(self, nlen, ndim, lattice_type='square', base_energy=0.,
+                 disorder_strength=0., disorder_type='uniform', random_seed=None):
+        """
+        Parameters:
+            1. nlen: int
+                     Number of lattice sites along each dimension.
+            2. ndim: int
+                     Number of dimensions of the lattice.
+            3. lattice_type: str
+                             Symmetry of lattice to generate. Currently limited to
+                             'square'.
+            4. base_energy: float
+                            Base energy of the lattice sites.
+            5. disorder_strength: float
+                                  Magnitude of energy disorder to add to the lattice.
+                                  This is the width of the uniform distribution or the
+                                  standard deviation of the Gaussian distribution.
+            6. disorder_type: str
+                              Form of random distribution for disorder. Currently
+                              limited to 'uniform' and 'gaussian'.
+            7. random_seed: int, optional
+                            Seed for random number generator.
+        """
         self.nlen = nlen
         self.ndim = ndim
         self.lattice_type = lattice_type.lower()
@@ -70,7 +92,19 @@ class BaseHamiltonian:
     """
     def __init__(self, lattice, base_coupling=1., coupling_type='nearest neighbor',
                  minimum_coupling=0.):
-        
+        """
+        Parameters:
+            1. lattice: Lattice object
+                        System lattice to be used for Hamiltonian construction.
+            2. base_coupling: float
+                              Base coupling strength between states.
+            3. coupling_type: str
+                              Type of distance-dependent coupling to be applied.
+                              Currently limited to 'nearest neighbor' and 'dipole'.
+            4. minimum_coupling: float
+                                 Cutoff for minimum allowed coupling strength before
+                                 being set to zero.
+        """
         # Take a Lattice object 
         if not isinstance(lattice, Lattice):
             raise TypeError("The 'lattice' argument must be an instance of the Lattice class.")
@@ -127,6 +161,19 @@ class SingleParticleHamiltonian(BaseHamiltonian):
     """
     def __init__(self, lattice, base_coupling=1., coupling_type='nearest neighbor', 
                  minimum_coupling=0.):
+        """
+        Parameters:
+            1. lattice: Lattice object
+                        System lattice to be used for Hamiltonian construction.
+            2. base_coupling: float
+                              Base coupling strength between states.
+            3. coupling_type: str
+                              Type of distance-dependent coupling to be applied.
+                              Currently limited to 'nearest neighbor' and 'dipole'.
+            4. minimum_coupling: float
+                                 Cutoff for minimum allowed coupling strength before
+                                 being set to zero.
+        """
         super().__init__(lattice, base_coupling, coupling_type, minimum_coupling)
 
         # 1. Define States
@@ -164,6 +211,20 @@ class ManyBodyHamiltonian(BaseHamiltonian):
     """
     def __init__(self, lattice, nparticles, base_coupling=1., 
                  coupling_type='nearest neighbor', minimum_coupling=0.):
+        """
+            1. lattice: Lattice object
+                        System lattice to be used for Hamiltonian construction.
+            2. nparticles: int
+                           Number of particles in the system.
+            3. base_coupling: float
+                              Base coupling strength between states.
+            4. coupling_type: str
+                              Type of distance-dependent coupling to be applied.
+                              Currently limited to 'nearest neighbor' and 'dipole'.
+            5. minimum_coupling: float
+                                 Cutoff for minimum allowed coupling strength before
+                                 being set to zero.
+"""
         super().__init__(lattice, base_coupling, coupling_type, minimum_coupling)
 
         self.nparticles = nparticles
