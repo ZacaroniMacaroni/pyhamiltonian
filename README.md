@@ -25,7 +25,7 @@ base_energy = 0.  # Base site energies
 disorder_type = 'uniform'  # Energy disorder distribution type
 disorder_strength = 0.5  # Strength of energy disorder
 
-lattice = lattice(nlen, ndim, base_energy, disorder_strength, disorder_type)
+lattice = Lattice(nlen, ndim, base_energy, disorder_strength, disorder_type)
 
 # Hamiltonian initialization
 nparticles = 2  # Number of particles
