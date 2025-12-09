@@ -31,6 +31,7 @@ class BasePlot:
         ax.set_ylabel('Eigenvalue')
         ax.plot(eigvals, ls='', marker='o')
         fig.show()
+        return fig, ax
 
 
 class NDimPlot(BasePlot):
@@ -141,6 +142,7 @@ class NDimPlot(BasePlot):
             surf = ax.plot_surface(X, Y, Z, cmap='viridis', vmin=0)
             fig.colorbar(surf, ax=ax, shrink=0.6, aspect=10, pad=0.1, label='Population')
             fig.show()
+            return fig, ax
 
 
 class NParticlePlot(BasePlot):
@@ -206,3 +208,4 @@ class NParticlePlot(BasePlot):
         ax.set_ylabel('Population')
         ax.plot(projected_eigpop)
         fig.show()
+        return fig, ax
