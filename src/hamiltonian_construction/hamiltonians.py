@@ -2,9 +2,28 @@ import itertools
 import numpy as np
 
 class Lattice:
+    """Lattice generator with optional static on-site disorder.
+
+    Parameters:
+        nlen (int): Number of lattice sites along each spatial dimension.
+        ndim (int): Dimensionality of the lattice (e.g., 1D, 2D).
+        lattice_type (str): Geometry of the lattice; currently supports 'square'.
+        base_energy (float): Base on-site energy assigned to each lattice site.
+        disorder_strength (float): Width of the uniform distribution or the
+            standard deviation of the Gaussian distribution used for disorder.
+        disorder_type (str): Disorder model, either 'uniform' or 'gaussian'.
+        random_seed (int, optional): Seed for ensuring reproducible disorder.
+
+    Attributes:
+        sites (list[tuple[int]]): Coordinates of all lattice sites.
+        site_energies (np.ndarray): On-site energies including applied disorder.
+        _coord_to_energy (dict): O(1) lookup for energy at a given site.
+
+    Methods:
+        get_energy_of_site(coordinate): Return the on-site energy of a specific
+            site coordinate.
     """
-    Class to handle Lattice generation and static disorder.
-    """
+
     def __init__(self, nlen, ndim, lattice_type='square', base_energy=0.,
                  disorder_strength=0., disorder_type='uniform', random_seed=None):
         """
