@@ -197,8 +197,25 @@ class BaseHamiltonian:
 
 
 class SingleParticleHamiltonian(BaseHamiltonian):
-    """
-    Single particle Hamiltonian.
+    """Hamiltonian for a single particle hopping on a lattice.
+
+    Parameters:
+        lattice (Lattice): Lattice describing available site positions and
+            on-site energies.
+        base_coupling (float): Base nearest-neighbor or dipole coupling strength.
+        coupling_type (str): Coupling rule, 'nearest neighbor' or 'dipole'.
+        minimum_coupling (float): Minimum magnitude for dipole couplings.
+
+    Attributes:
+        state_list (list[tuple[int]]): Single-particle states; one per lattice 
+            site.
+        energies (np.ndarray): Energies of single-particle states, pulled 
+            directly from lattice site energies.
+
+    Methods:
+        construct_hamiltonian(): Assemble the single-particle Hamiltonian.
+        _assign_couplings(state_1, state_2): Return coupling strength based on 
+            Euclidean distance and the specified coupling rule.
     """
     def __init__(self, lattice, base_coupling=1., coupling_type='nearest neighbor', 
                  minimum_coupling=0.):
