@@ -264,8 +264,29 @@ class SingleParticleHamiltonian(BaseHamiltonian):
         return np.array([self.lattice.get_energy_of_site(site) for site in self.state_list])
 
 class ManyBodyHamiltonian(BaseHamiltonian):
-    """
-    Many-Body Hamiltonian.
+    """Hamiltonian for a system of multiple distinguishable positions
+    (hard-core bosons or fermions implicitly) on a lattice.
+
+    Parameters:
+        lattice (Lattice): The system lattice defining spatial geometry.
+        nparticles (int): Number of particles in the many-body system.
+        base_coupling (float): Base hopping amplitude for particle transitions.
+        coupling_type (str): Coupling rule ('nearest neighbor' or 'dipole').
+        minimum_coupling (float): Minimum size for allowed dipole couplings.
+
+    Attributes:
+        nparticles (int): Number of particles occupying the lattice.
+        state_list (list[tuple]): Many-body basis states, each a tuple of site 
+            coordinates representing particle positions.
+        energies (np.ndarray): Total energy of each many-body state, computed as 
+            the sum of the constituent site energies.
+
+    Methods:
+        construct_hamiltonian(): Build the full many-body Hamiltonian matrix.
+        _calculate_many_body_energies(): Sum on-site energies over occupied
+            positions in each state.
+        _assign_couplings(state_1, state_2): Compute coupling only when the two
+            many-body states differ by exactly one particle hop.
     """
     def __init__(self, lattice, nparticles, base_coupling=1., 
                  coupling_type='nearest neighbor', minimum_coupling=0.):
