@@ -106,8 +106,30 @@ class Lattice:
         return self._coord_to_energy[coordinate]
 
 class BaseHamiltonian:
-    """
-    Base Hamiltonian class.
+    """Abstract base class for Hamiltonian construction on a lattice.
+
+    Parameters:
+        lattice (Lattice): The lattice object providing site geometry and
+            on-site energies.
+        base_coupling (float): Base strength for the hopping/coupling terms.
+        coupling_type (str): Functional form for couplings; supports 
+            'nearest neighbor' or 'dipole'.
+        minimum_coupling (float): Coupling values below this threshold are
+            truncated to zero.
+
+    Attributes:
+        lattice (Lattice): Underlying lattice used to define state structure.
+        base_coupling (float): Base coupling amplitude.
+        coupling_type (str): Selected coupling rule.
+        minimum_coupling (float): Cutoff for small couplings.
+        state_list (list): States of the system; defined by subclasses.
+        energies (np.ndarray): Energies associated with each state.
+
+    Methods:
+        construct_hamiltonian(): Build and return the Hamiltonian matrix with
+            diagonal energies and off-diagonal couplings.
+        _assign_couplings(state_1, state_2): Abstract method; must be 
+            implemented to define couplings for specific models.
     """
     def __init__(self, lattice, base_coupling=1., coupling_type='nearest neighbor',
                  minimum_coupling=0.):
